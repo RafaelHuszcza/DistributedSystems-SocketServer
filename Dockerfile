@@ -14,7 +14,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Exponha as portas nas quais o servidor estará disponível
-EXPOSE 8000
+EXPOSE $PORT
 
 # Comando para iniciar o servidor
 CMD ["python", "main.py"]

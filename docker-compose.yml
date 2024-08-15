@@ -14,7 +14,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT}
+      - SERVER_PORT=${SERVER_PORT-1}
     networks:
       - chat-network
   websocket-2:
@@ -30,7 +30,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT}
+      - SERVER_PORT=${SERVER_PORT-2}
     networks:
       - chat-network
 
