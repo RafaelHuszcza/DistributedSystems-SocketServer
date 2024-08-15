@@ -1,12 +1,28 @@
 version: '3.8'
 
 services:
-  websocket:
+  websocket-1:
     build:
       context: .
-    container_name: websocket-python
+    container_name: websocket-python-1
     ports:
       - "8000:8000"
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+    networks:
+      - chat-network
+  websocket-2:
+    build:
+      context: .
+    container_name: websocket-python-2
+    ports:
+      - "8001:8001"
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
