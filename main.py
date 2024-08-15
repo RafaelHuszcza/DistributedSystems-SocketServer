@@ -33,6 +33,7 @@ def handle_client(client_socket, client_address):
 
     try:
         # Step 1: Perform WebSocket handshake
+        print("Try handshake", flush=True)
         request = client_socket.recv(1024).decode('utf-8')
         headers = parse_headers(request)
         
@@ -41,7 +42,7 @@ def handle_client(client_socket, client_address):
             print("Invalid WebSocket request", flush=True)
             client_socket.close()
             return
-
+        print("The Key",websocket_key, flush=True)
         accept_key = create_websocket_accept_key(websocket_key)
         handshake_response = (
             "HTTP/1.1 101 Switching Protocols\r\n"
@@ -53,12 +54,18 @@ def handle_client(client_socket, client_address):
         
         # Step 2: Receive and handle WebSocket frames
         while True:
-            frame = client_socket.recv(1024)
+            print(f"Waiting for message from client {client_id}", flush=True)
+            frame = client_socket.recv(2048)
             if not frame:
+                print(f"Connection closed by client {client_id}", flush=True)
                 break
             opcode, payload = decode_websocket_frame(frame)
+            print(f"Received frame with opcode {opcode}", flush=True)
+
             if opcode == 8:  # Close frame
-                print(f"Connection closed by client {client_id}")
+                print(f"Connection closed by client {client_id}",flush=True)
+                allCo = decode_websocket_frame_all(frame)
+                print("All",allCo, flush=True)
 
                 # Inform all clients that a user left
                 with lock:
@@ -79,7 +86,7 @@ def handle_client(client_socket, client_address):
             if opcode == 1:  # Text frame
                 message = payload.decode('utf-8')
                 message_serialized = json.loads(message)
-                
+                print(f"Received message from client {client_id}: {message_serialized}", flush=True)
                 if message_serialized["type"] == 'join':
                     room_id = message_serialized["roomId"]
                     author_id = message_serialized["authorId"]
@@ -141,6 +148,52 @@ def parse_headers(request):
             headers[key] = value
     return headers
 
+def decode_websocket_frame_all(frame):
+    """Decodes a WebSocket frame and returns detailed information about the frame."""
+    if not frame:
+        return None, None, None, None, None
+
+    byte1, byte2 = frame[:2]
+    fin = byte1 & 0b10000000  # Final fragment flag
+    rsv1 = byte1 & 0b01000000  # RSV1
+    rsv2 = byte1 & 0b00100000  # RSV2
+    rsv3 = byte1 & 0b00010000  # RSV3
+    opcode = byte1 & 0b00001111  # Opcode
+
+    is_masked = byte2 & 0b10000000  # Mask bit
+    payload_length = byte2 & 0b01111111  # Payload length
+
+    mask = None
+    payload = None
+    mask_start = 2
+
+    if payload_length == 126:
+        payload_length = struct.unpack(">H", frame[2:4])[0]
+        mask_start = 4
+    elif payload_length == 127:
+        payload_length = struct.unpack(">Q", frame[2:10])[0]
+        mask_start = 10
+
+    if is_masked:
+        mask = frame[mask_start:mask_start + 4]
+        payload_start = mask_start + 4
+        payload = bytearray(frame[payload_start:payload_start + payload_length])
+        for i in range(payload_length):
+            payload[i] ^= mask[i % 4]
+    else:
+        payload = frame[mask_start:mask_start + payload_length]
+
+    return {
+        "fin": fin,
+        "rsv1": rsv1,
+        "rsv2": rsv2,
+        "rsv3": rsv3,
+        "opcode": opcode,
+        "masked": is_masked,
+        "payload_length": payload_length,
+        "mask": mask,
+        "payload": payload
+    }
 def decode_websocket_frame(frame):
     """Decodes a WebSocket frame and returns the opcode and payload."""
     byte1, byte2 = frame[:2]

@@ -11,6 +11,7 @@ def connect():
     db_password = os.getenv('DB_PASSWORD', 'admin')
     db_host = os.getenv('DB_HOST', '127.0.0.1')
     db_port = os.getenv('DB_PORT', '5432')
+    print(db_name, db_user, db_password, db_host, db_port)
     # Conectando ao banco de dados
     conn = psycopg2.connect(
         database=db_name,
