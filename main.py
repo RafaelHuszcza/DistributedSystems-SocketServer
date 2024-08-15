@@ -244,7 +244,7 @@ def run_server(host='0.0.0.0', port=8080):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(5)
-    print(f"WebSocket server running on ws://{host}:{port}", flush=True)
+    print(f"WebSocket server running on wss://{host}:{port}", flush=True)
 
     try:
         while True:
