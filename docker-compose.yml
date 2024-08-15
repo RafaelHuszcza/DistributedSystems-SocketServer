@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  websocket:
+    build:
+      context: .
+    container_name: websocket-python
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    external: true

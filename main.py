@@ -6,7 +6,9 @@ import struct
 import json
 from message_handlers import handle_room_join, handle_text_message, handle_client_leave
 import os
-
+from dotenv import load_dotenv
+# Carregar variáveis de ambiente do arquivo .env
+load_dotenv()
 # Constants
 MAGIC_STRING = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
@@ -25,7 +27,7 @@ def create_websocket_accept_key(key):
 def handle_client(client_socket, client_address):
     """Handles the WebSocket connection with a client."""
     client_id = client_address[1]  # Using port number as a unique client ID
-
+    print (f"Client {client_id} connected", flush=True)
     with lock:
         clients_connected[client_id] = {"socket": client_socket, "rooms": []}
 
@@ -36,7 +38,7 @@ def handle_client(client_socket, client_address):
         
         websocket_key = headers.get("Sec-WebSocket-Key")
         if not websocket_key:
-            print("Invalid WebSocket request")
+            print("Invalid WebSocket request", flush=True)
             client_socket.close()
             return
 
@@ -189,12 +191,12 @@ def run_server(host='0.0.0.0', port=8080):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(5)
-    print(f"WebSocket server running on ws://{host}:{port}")
+    print(f"WebSocket server running on ws://{host}:{port}", flush=True)
 
     try:
         while True:
             client_socket, client_address = server_socket.accept()
-            print(f"Connection from {client_address}")
+            print(f"Connection from {client_address}", flush=True)
             threading.Thread(target=handle_client, args=(client_socket, client_address)).start()
 
     except KeyboardInterrupt:
@@ -203,6 +205,7 @@ def run_server(host='0.0.0.0', port=8080):
         server_socket.close()
 
 if __name__ == "__main__":
-    host = os.getenv('SERVER_HOST', '0.0.0.0')
-    port = os.getenv('SERVER_PORT', 8080)
+    # host = os.getenv('SERVER_HOST', '0.0.0.0')
+    host = '0.0.0.0'
+    port = int(os.getenv('SERVER_PORT', 8080))
     run_server(host,port)

@@ -3,15 +3,14 @@ import uuid
 import json
 import time
 import os
+from dotenv import load_dotenv
 def connect():
-    
-      # Importando as variáveis de ambiente
+    load_dotenv()
     db_name = os.getenv('DB_NAME', 'chat-distribuidos')
     db_user = os.getenv('DB_USER', 'admin')
     db_password = os.getenv('DB_PASSWORD', 'admin')
     db_host = os.getenv('DB_HOST', '127.0.0.1')
     db_port = os.getenv('DB_PORT', '5432')
-    
     # Conectando ao banco de dados
     conn = psycopg2.connect(
         database=db_name,
