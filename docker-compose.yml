@@ -6,7 +6,7 @@ services:
       context: .
     container_name: websocket-python-1
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT_1}:${SERVER_PORT_1}"
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
@@ -14,7 +14,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT-1}
+      - SERVER_PORT=${SERVER_PORT_1}
     networks:
       - chat-network
   websocket-2:
@@ -22,7 +22,7 @@ services:
       context: .
     container_name: websocket-python-2
     ports:
-      - "8001:8001"
+      - "${SERVER_PORT_2}:${SERVER_PORT_2}"
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
@@ -30,7 +30,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT-2}
+      - SERVER_PORT=${SERVER_PORT_2}
     networks:
       - chat-network
 
